@@ -1,6 +1,8 @@
 #include <pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h> 
+
 struct bpf_program fp;
 
 void packet_handler(u_char* user_data, const struct pcap_pkthdr* pkthdr, const u_char* packet_data)
@@ -21,6 +23,7 @@ int main()
     pcap_if_t* d;
     int i = 0;
     char errbuf[PCAP_ERRBUF_SIZE];
+    char filter_exp[100]; 
 
     if (pcap_findalldevs(&alldevs, errbuf) == -1)
     {
@@ -65,7 +68,13 @@ int main()
         i++;
     }
 
-    char filter_exp[] = "port 80";
+    printf("Enter the filter expression (e.g., 'port 80'): ");
+    if (scanf_s("%99s", filter_exp) != 1)
+    {
+        printf("Invalid input. Exiting.\n");
+        return 1;
+    }
+
     pcap_t* handle;
     handle = pcap_open_live(d->name, BUFSIZ, 1, 1000, errbuf);
     if (handle == NULL)
